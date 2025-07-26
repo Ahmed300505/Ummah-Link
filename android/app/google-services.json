@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1007558518465",
+    "project_id": "ummahlink-39e9d",
+    "storage_bucket": "ummahlink-39e9d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1007558518465:android:2be0b59fccd122540d9640",
+        "android_client_info": {
+          "package_name": "com.example.islamicinstapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDntf35YqMRywvoZDVpWNU120D62JCsbrE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
