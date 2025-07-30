@@ -5,6 +5,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:islamicinstapp/Service/AuthService.dart';
 import 'package:islamicinstapp/screens/home_page.dart';
+import 'package:islamicinstapp/screens/umrahLinks.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterProvider with ChangeNotifier {
   bool _isLoading = false;
@@ -97,7 +99,8 @@ class RegisterProvider with ChangeNotifier {
       );
       return;
     }
-
+    final prefs = await SharedPreferences.getInstance();
+    final selectedRole = prefs.getString('selectedRole') ?? 'member';
     _isLoading = true;
     notifyListeners();
 
@@ -109,6 +112,7 @@ class RegisterProvider with ChangeNotifier {
         username: usernameController.text.trim(),
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
+        role: selectedRole,
       );
 
       if (user == null || user.uid.isEmpty) {
@@ -142,7 +146,7 @@ class RegisterProvider with ChangeNotifier {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const HomePage()),
+        MaterialPageRoute(builder: (_) => const UmrahLinks()),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

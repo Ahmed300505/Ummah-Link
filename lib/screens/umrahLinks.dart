@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:islamicinstapp/Provider/umrah_links_provider.dart';
+import 'package:islamicinstapp/Service/ForyouService.dart';
 import 'package:provider/provider.dart';
 import 'package:islamicinstapp/screens/home_page.dart';
 import '../styles/colors.dart';
@@ -231,13 +232,19 @@ class _UmrahLinksContent extends StatelessWidget {
               screenSize.height * 0.018,
             ),
           ),
-          onPressed: () {
+          onPressed: () async {
             final selectedItems = umrahProvider.getSelectedLinks();
-            debugPrint('Selected items: $selectedItems');
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const HomePage()),
-            );
+            try {
+              await ForYouService().saveForYouInterests(selectedItems);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const HomePage()),
+              );
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Failed to save interests: \$e')),
+              );
+            }
           },
           child: Text(
             'Continue',

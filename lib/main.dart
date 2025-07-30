@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        Provider<AuthService>(create: (_) => AuthService()), // ✅ ADD THIS LINE
+        Provider<AuthService>(create: (_) => AuthService()),
         ChangeNotifierProvider(create: (_) => SplashProvider()),
         ChangeNotifierProvider(create: (_) => AuthSelectionProvider()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
@@ -58,43 +58,46 @@ class AuthWrapper extends StatefulWidget {
 
 class _AuthWrapperState extends State<AuthWrapper> {
   bool _showSplash = true;
-  bool _isFirstTime = true;
   Widget _initialRoute = SplashScreen();
 
   @override
   void initState() {
     super.initState();
-    _checkFirstTime();
     _checkAuthState();
-  }
-
-  Future<void> _checkFirstTime() async {
-    final prefs = await SharedPreferences.getInstance();
-    _isFirstTime = prefs.getBool('first_time') ?? true;
-    if (_isFirstTime) {
-      await prefs.setBool('first_time', false);
-    }
   }
 
   Future<void> _checkAuthState() async {
     // Add slight delay to allow splash screen to be visible
     await Future.delayed(Duration(milliseconds: 1500));
 
-    FirebaseAuth.instance.authStateChanges().listen((User? user) {
-      if (user != null && user.emailVerified) {
-        // User is logged in and email is verified
-        setState(() {
-          _initialRoute = HomePage(); // Your main app screen
-          _showSplash = _isFirstTime;
-        });
-      } else {
-        // User is not logged in or email not verified
-        setState(() {
-          _initialRoute = AuthSelectionScreen(); // Your auth selection screen
-          _showSplash = _isFirstTime;
-        });
-      }
-    });
+    final prefs = await SharedPreferences.getInstance();
+    final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+
+    if (isLoggedIn) {
+      // User was previously logged in, check Firebase auth state
+      FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+        if (user != null && user.emailVerified) {
+          // User is logged in and email is verified
+          setState(() {
+            _initialRoute = HomePage();
+            _showSplash = false;
+          });
+        } else {
+          // User is not logged in or email not verified
+          await prefs.remove('isLoggedIn');
+          setState(() {
+            _initialRoute = AuthSelectionScreen();
+            _showSplash = false;
+          });
+        }
+      });
+    } else {
+      // User was not logged in
+      setState(() {
+        _initialRoute = AuthSelectionScreen();
+        _showSplash = false;
+      });
+    }
   }
 
   @override

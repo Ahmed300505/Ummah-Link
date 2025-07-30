@@ -169,7 +169,7 @@ class _AuthSelectionContent extends StatelessWidget {
                                 provider.selectLeader();
                                 Navigator.pushReplacement(
                                   context,
-                                  MaterialPageRoute(builder: (_) => const UmrahLinks()),
+                                  MaterialPageRoute(builder: (_) => const LoginScreen()),
                                 );
                               },
                               child: Text(

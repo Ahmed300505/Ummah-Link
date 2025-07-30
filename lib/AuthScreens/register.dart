@@ -25,9 +25,11 @@ class _RegisterScreenContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-    final isVerySmallScreen = screenSize.height < 600;
-    final isSmallScreen = screenSize.height < 700;
+    final screenSize = MediaQuery.of(context).size; 
+    final isExtraSmallScreen = screenSize.height < 600; // Small phones
+    final isSmallScreen = screenSize.height < 700; // Medium phones
+    final isMediumScreen = screenSize.height < 800; // Large phones
+    final isLargeScreen = screenSize.height >= 800; // Tablets
     final isNarrowScreen = screenSize.width < 350;
     final isWideScreen = screenSize.width > 400;
 
@@ -36,7 +38,11 @@ class _RegisterScreenContent extends StatelessWidget {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(vertical: isVerySmallScreen ? 10 : 20),
+            padding: EdgeInsets.symmetric(
+              vertical: isExtraSmallScreen ? 10 :
+              isSmallScreen ? 15 :
+              isMediumScreen ? 20 : 25,
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -44,7 +50,9 @@ class _RegisterScreenContent extends StatelessWidget {
                 Container(
                   width: isWideScreen ? screenSize.width * 0.85 : screenSize.width * 0.9,
                   constraints: const BoxConstraints(maxWidth: 500),
-                  margin: EdgeInsets.symmetric(horizontal: isNarrowScreen ? 10 : 20),
+                  margin: EdgeInsets.symmetric(
+                    horizontal: isNarrowScreen ? 12 : 20,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFF5F5DC),
                     borderRadius: BorderRadius.circular(20),
@@ -59,22 +67,22 @@ class _RegisterScreenContent extends StatelessWidget {
                   child: Column(
                     children: [
                       // Logo
-                      _buildLogo(context, isVerySmallScreen, isSmallScreen),
+                      _buildLogo(context, isExtraSmallScreen, isSmallScreen),
 
                       // Title and Sign In link
-                      _buildHeader(context, isVerySmallScreen, isSmallScreen, isNarrowScreen),
+                      _buildHeader(context, isExtraSmallScreen, isSmallScreen, isNarrowScreen),
 
                       // Form Fields
-                      _buildFormFields(context, isVerySmallScreen, isSmallScreen, isNarrowScreen),
+                      _buildFormFields(context, isExtraSmallScreen, isSmallScreen, isMediumScreen, isNarrowScreen),
 
                       // Register Button
-                      _buildRegisterButton(context, isVerySmallScreen, isSmallScreen, isNarrowScreen),
+                      _buildRegisterButton(context, isExtraSmallScreen, isSmallScreen, isMediumScreen),
                     ],
                   ),
                 ),
 
                 // Terms and Privacy text
-                _buildTermsAndPrivacy(context, isVerySmallScreen, isSmallScreen, isNarrowScreen),
+                _buildTermsAndPrivacy(context, isExtraSmallScreen, isSmallScreen, isNarrowScreen),
               ],
             ),
           ),
@@ -83,11 +91,13 @@ class _RegisterScreenContent extends StatelessWidget {
     );
   }
 
-  Widget _buildLogo(BuildContext context, bool isVerySmallScreen, bool isSmallScreen) {
-    final double logoSize = isVerySmallScreen ? 90 : isSmallScreen ? 120 : 140;
+  Widget _buildLogo(BuildContext context, bool isExtraSmallScreen, bool isSmallScreen) {
+    final double logoSize = isExtraSmallScreen ? 90 :
+    isSmallScreen ? 110 :
+    140;
 
     return Transform.translate(
-      offset: Offset(0, isVerySmallScreen ? -25 : -40),
+      offset: Offset(0, isExtraSmallScreen ? -25 : -40),
       child: Stack(
         alignment: Alignment.center,
         children: [
@@ -131,24 +141,32 @@ class _RegisterScreenContent extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, bool isVerySmallScreen, bool isSmallScreen, bool isNarrowScreen) {
+  Widget _buildHeader(BuildContext context, bool isExtraSmallScreen, bool isSmallScreen, bool isNarrowScreen) {
     return Padding(
       padding: EdgeInsets.only(
-          top: isVerySmallScreen ? 0 : isSmallScreen ? 10 : 15,
-          bottom: isVerySmallScreen ? 8 : isSmallScreen ? 12 : 20),
+        top: isExtraSmallScreen ? 0 :
+        isSmallScreen ? 10 : 15,
+        bottom: isExtraSmallScreen ? 8 :
+        isSmallScreen ? 12 : 20,
+      ),
       child: Column(
         children: [
           Text(
             'Create Account',
-            style: TextStyles.registerTitleText(context),
+            style: TextStyles.registerTitleText(context).copyWith(
+              fontSize: isExtraSmallScreen ? 22 :
+              isSmallScreen ? 24 : 26,
+            ),
           ),
-          SizedBox(height: isVerySmallScreen ? 5 : 8),
+          SizedBox(height: isExtraSmallScreen ? 5 : 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
                 "Already have an account? ",
-                style: TextStyles.registerFooterText(context),
+                style: TextStyles.registerFooterText(context).copyWith(
+                  fontSize: isExtraSmallScreen ? 12 : 14,
+                ),
               ),
               GestureDetector(
                 onTap: () {
@@ -159,8 +177,10 @@ class _RegisterScreenContent extends StatelessWidget {
                 },
                 child: Text(
                   'Sign In',
-                  style: TextStyles.registerFooterText(context)
-                      .copyWith(fontWeight: FontWeight.bold),
+                  style: TextStyles.registerFooterText(context).copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: isExtraSmallScreen ? 12 : 14,
+                  ),
                 ),
               ),
             ],
@@ -170,12 +190,29 @@ class _RegisterScreenContent extends StatelessWidget {
     );
   }
 
-  Widget _buildFormFields(BuildContext context, bool isVerySmallScreen, bool isSmallScreen, bool isNarrowScreen) {
+  Widget _buildFormFields(
+      BuildContext context,
+      bool isExtraSmallScreen,
+      bool isSmallScreen,
+      bool isMediumScreen,
+      bool isNarrowScreen,
+      ) {
     final registerProvider = Provider.of<RegisterProvider>(context, listen: false);
+
+    // Calculate responsive gaps
+    final double fieldGap = isExtraSmallScreen ? 8 :
+    isSmallScreen ? 10 :
+    isMediumScreen ? 12 : 14;
+    final double sectionGap = isExtraSmallScreen ? 12 :
+    isSmallScreen ? 16 :
+    isMediumScreen ? 20 : 24;
 
     return Padding(
       padding: EdgeInsets.symmetric(
-          horizontal: isNarrowScreen ? 12 : isSmallScreen ? 18 : 20),
+        horizontal: isNarrowScreen ? 12 :
+        isSmallScreen ? 16 :
+        20,
+      ),
       child: Column(
         children: [
           _buildTextField(
@@ -183,58 +220,60 @@ class _RegisterScreenContent extends StatelessWidget {
             controller: registerProvider.nameController,
             hintText: 'Name',
             icon: Icons.person,
-            isSmallScreen: isVerySmallScreen,
+            isExtraSmallScreen: isExtraSmallScreen,
           ),
-          SizedBox(height: isVerySmallScreen ? 6 : isSmallScreen ? 10 : 12),
+          SizedBox(height: fieldGap),
           _buildTextField(
             context: context,
             controller: registerProvider.usernameController,
             hintText: 'Username',
             icon: Icons.person_outline,
-            isSmallScreen: isVerySmallScreen,
+            isExtraSmallScreen: isExtraSmallScreen,
           ),
-          SizedBox(height: isVerySmallScreen ? 6 : isSmallScreen ? 10 : 12),
+          SizedBox(height: fieldGap),
           _buildTextField(
             context: context,
             controller: registerProvider.emailController,
             hintText: 'Email Address',
             icon: Icons.email_outlined,
-            isSmallScreen: isVerySmallScreen,
+            isExtraSmallScreen: isExtraSmallScreen,
           ),
+          SizedBox(height: fieldGap),
           _buildTextField(
             context: context,
             controller: registerProvider.bioController,
             hintText: 'Bio (optional)',
             icon: Icons.info_outline,
-            isSmallScreen: isVerySmallScreen,
+            isExtraSmallScreen: isExtraSmallScreen,
           ),
-          SizedBox(height: isVerySmallScreen ? 6 : isSmallScreen ? 10 : 12),
-          SizedBox(height: isVerySmallScreen ? 6 : isSmallScreen ? 10 : 12),
+          SizedBox(height: sectionGap),
           _buildPasswordField(
             context: context,
             controller: registerProvider.passwordController,
-            isSmallScreen: isVerySmallScreen,
+            isExtraSmallScreen: isExtraSmallScreen,
             isPassword: true,
           ),
-          SizedBox(height: isVerySmallScreen ? 6 : isSmallScreen ? 10 : 12),
+          SizedBox(height: fieldGap),
           _buildConfirmPasswordField(
             context: context,
             controller: registerProvider.confirmPasswordController,
-            isSmallScreen: isVerySmallScreen,
+            isExtraSmallScreen: isExtraSmallScreen,
           ),
-          SizedBox(height: isVerySmallScreen ? 6 : isSmallScreen ? 10 : 12),
+          SizedBox(height: sectionGap),
           _buildImagePickerField(
             context: context,
             label: 'Profile Image',
             isProfile: true,
-            isSmallScreen: isVerySmallScreen,
+            isExtraSmallScreen: isExtraSmallScreen,
+            isSmallScreen: isSmallScreen,
           ),
-          SizedBox(height: isVerySmallScreen ? 6 : isSmallScreen ? 10 : 12),
+          SizedBox(height: fieldGap),
           _buildImagePickerField(
             context: context,
             label: 'Banner Image',
             isProfile: false,
-            isSmallScreen: isVerySmallScreen,
+            isExtraSmallScreen: isExtraSmallScreen,
+            isSmallScreen: isSmallScreen,
           ),
         ],
       ),
@@ -246,7 +285,7 @@ class _RegisterScreenContent extends StatelessWidget {
     required TextEditingController controller,
     required String hintText,
     required IconData icon,
-    bool isSmallScreen = false,
+    bool isExtraSmallScreen = false,
   }) {
     final isNarrowScreen = MediaQuery.of(context).size.width < 350;
 
@@ -258,13 +297,18 @@ class _RegisterScreenContent extends StatelessWidget {
         fillColor: AppColors.primary,
         hintText: hintText,
         hintStyle: const TextStyle(color: Colors.white70),
-        prefixIcon: Icon(icon, color: Colors.white, size: isNarrowScreen ? 20 : 22),
+        prefixIcon: Icon(
+          icon,
+          color: Colors.white,
+          size: isNarrowScreen ? 18 :
+          isExtraSmallScreen ? 20 : 22,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide.none,
         ),
         contentPadding: EdgeInsets.symmetric(
-          vertical: isSmallScreen ? 12 : 15,
+          vertical: isExtraSmallScreen ? 12 : 15,
           horizontal: 15,
         ),
       ),
@@ -274,7 +318,7 @@ class _RegisterScreenContent extends StatelessWidget {
   Widget _buildPasswordField({
     required BuildContext context,
     required TextEditingController controller,
-    bool isSmallScreen = false,
+    bool isExtraSmallScreen = false,
     bool isPassword = false,
   }) {
     final registerProvider = Provider.of<RegisterProvider>(context);
@@ -289,13 +333,20 @@ class _RegisterScreenContent extends StatelessWidget {
         fillColor: AppColors.primary,
         hintText: 'Password',
         hintStyle: const TextStyle(color: Colors.white70),
-        prefixIcon: Icon(Icons.lock_outline, color: Colors.white, size: isNarrowScreen ? 20 : 22),
+        prefixIcon: Icon(
+          Icons.lock_outline,
+          color: Colors.white,
+          size: isNarrowScreen ? 18 :
+          isExtraSmallScreen ? 20 : 22,
+        ),
         suffixIcon: IconButton(
           icon: Icon(
             registerProvider.obscurePassword
                 ? Icons.visibility_off
                 : Icons.visibility,
             color: Colors.white70,
+            size: isNarrowScreen ? 18 :
+            isExtraSmallScreen ? 20 : 22,
           ),
           onPressed: () => registerProvider.togglePasswordVisibility(),
         ),
@@ -304,7 +355,7 @@ class _RegisterScreenContent extends StatelessWidget {
           borderSide: BorderSide.none,
         ),
         contentPadding: EdgeInsets.symmetric(
-          vertical: isSmallScreen ? 12 : 15,
+          vertical: isExtraSmallScreen ? 12 : 15,
           horizontal: 15,
         ),
       ),
@@ -314,7 +365,7 @@ class _RegisterScreenContent extends StatelessWidget {
   Widget _buildConfirmPasswordField({
     required BuildContext context,
     required TextEditingController controller,
-    bool isSmallScreen = false,
+    bool isExtraSmallScreen = false,
   }) {
     final registerProvider = Provider.of<RegisterProvider>(context);
     final isNarrowScreen = MediaQuery.of(context).size.width < 350;
@@ -328,13 +379,20 @@ class _RegisterScreenContent extends StatelessWidget {
         fillColor: AppColors.primary,
         hintText: 'Confirm Password',
         hintStyle: const TextStyle(color: Colors.white70),
-        prefixIcon: Icon(Icons.lock_outline, color: Colors.white, size: isNarrowScreen ? 20 : 22),
+        prefixIcon: Icon(
+          Icons.lock_outline,
+          color: Colors.white,
+          size: isNarrowScreen ? 18 :
+          isExtraSmallScreen ? 20 : 22,
+        ),
         suffixIcon: IconButton(
           icon: Icon(
             registerProvider.obscureConfirmPassword
                 ? Icons.visibility_off
                 : Icons.visibility,
             color: Colors.white70,
+            size: isNarrowScreen ? 18 :
+            isExtraSmallScreen ? 20 : 22,
           ),
           onPressed: () => registerProvider.toggleConfirmPasswordVisibility(),
         ),
@@ -343,7 +401,7 @@ class _RegisterScreenContent extends StatelessWidget {
           borderSide: BorderSide.none,
         ),
         contentPadding: EdgeInsets.symmetric(
-          vertical: isSmallScreen ? 12 : 15,
+          vertical: isExtraSmallScreen ? 12 : 15,
           horizontal: 15,
         ),
       ),
@@ -354,6 +412,7 @@ class _RegisterScreenContent extends StatelessWidget {
     required BuildContext context,
     required String label,
     required bool isProfile,
+    bool isExtraSmallScreen = false,
     bool isSmallScreen = false,
   }) {
     final registerProvider = Provider.of<RegisterProvider>(context);
@@ -366,14 +425,15 @@ class _RegisterScreenContent extends StatelessWidget {
           label,
           style: TextStyle(
             color: Colors.white,
-            fontSize: isSmallScreen ? 14 : 16,
+            fontSize: isExtraSmallScreen ? 14 : 16,
           ),
         ),
-        SizedBox(height: isSmallScreen ? 6 : 8),
+        SizedBox(height: isExtraSmallScreen ? 6 : 8),
         GestureDetector(
           onTap: () => registerProvider.pickImage(isProfile),
           child: Container(
-            height: isSmallScreen ? 100 : 120,
+            height: isExtraSmallScreen ? 100 :
+            isSmallScreen ? 120 : 140,
             width: double.infinity,
             decoration: BoxDecoration(
               color: AppColors.primary,
@@ -387,14 +447,15 @@ class _RegisterScreenContent extends StatelessWidget {
                 Icon(
                   isProfile ? Icons.person : Icons.image,
                   color: Colors.white70,
-                  size: isSmallScreen ? 30 : 40,
+                  size: isExtraSmallScreen ? 30 :
+                  isSmallScreen ? 35 : 40,
                 ),
-                SizedBox(height: isSmallScreen ? 4 : 8),
+                SizedBox(height: isExtraSmallScreen ? 4 : 8),
                 Text(
                   'Tap to select ${isProfile ? 'profile' : 'banner'} image',
                   style: TextStyle(
                     color: Colors.white70,
-                    fontSize: isSmallScreen ? 12 : 14,
+                    fontSize: isExtraSmallScreen ? 12 : 14,
                   ),
                 ),
               ],
@@ -412,11 +473,20 @@ class _RegisterScreenContent extends StatelessWidget {
     );
   }
 
-  Widget _buildRegisterButton(BuildContext context, bool isVerySmallScreen, bool isSmallScreen, bool isNarrowScreen) {
+  Widget _buildRegisterButton(
+      BuildContext context,
+      bool isExtraSmallScreen,
+      bool isSmallScreen,
+      bool isMediumScreen,
+      ) {
     final registerProvider = Provider.of<RegisterProvider>(context);
 
     return Padding(
-      padding: EdgeInsets.all(isVerySmallScreen ? 10 : isSmallScreen ? 15 : 20),
+      padding: EdgeInsets.all(
+        isExtraSmallScreen ? 10 :
+        isSmallScreen ? 15 :
+        isMediumScreen ? 18 : 20,
+      ),
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton(
@@ -424,7 +494,10 @@ class _RegisterScreenContent extends StatelessWidget {
             backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
             padding: EdgeInsets.symmetric(
-                vertical: isVerySmallScreen ? 10 : isSmallScreen ? 14 : 16),
+              vertical: isExtraSmallScreen ? 12 :
+              isSmallScreen ? 14 :
+              isMediumScreen ? 16 : 18,
+            ),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
@@ -458,28 +531,39 @@ class _RegisterScreenContent extends StatelessWidget {
               ? const CircularProgressIndicator(color: Colors.white)
               : Text(
             'Register',
-            style: TextStyles.registerButtonText(context),
+            style: TextStyles.registerButtonText(context).copyWith(
+              fontSize: isExtraSmallScreen ? 16 : 18,
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildTermsAndPrivacy(BuildContext context, bool isVerySmallScreen, bool isSmallScreen, bool isNarrowScreen) {
+  Widget _buildTermsAndPrivacy(
+      BuildContext context,
+      bool isExtraSmallScreen,
+      bool isSmallScreen,
+      bool isNarrowScreen,
+      ) {
     return Padding(
       padding: EdgeInsets.only(
-          top: isVerySmallScreen ? 12 : isSmallScreen ? 16 : 20,
-          left: 20,
-          right: 20,
-          bottom: isVerySmallScreen ? 10 : 15),
+        top: isExtraSmallScreen ? 12 :
+        isSmallScreen ? 16 : 20,
+        left: 20,
+        right: 20,
+        bottom: isExtraSmallScreen ? 10 : 15,
+      ),
       child: Column(
         children: [
           Text(
             'By Creating an account you agree to our',
-            style: TextStyles.termsText(context),
+            style: TextStyles.termsText(context).copyWith(
+              fontSize: isExtraSmallScreen ? 12 : 14,
+            ),
             textAlign: TextAlign.center,
           ),
-          SizedBox(height: isVerySmallScreen ? 3 : 4),
+          SizedBox(height: isExtraSmallScreen ? 3 : 4),
           Wrap(
             alignment: WrapAlignment.center,
             crossAxisAlignment: WrapCrossAlignment.center,
@@ -488,22 +572,28 @@ class _RegisterScreenContent extends StatelessWidget {
                 onTap: () {},
                 child: Text(
                   'Terms Of Service',
-                  style: TextStyles.termsText(context)
-                      .copyWith(fontWeight: FontWeight.bold),
+                  style: TextStyles.termsText(context).copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: isExtraSmallScreen ? 12 : 14,
+                  ),
                 ),
               ),
               const SizedBox(width: 4),
               Text(
                 'and',
-                style: TextStyles.termsText(context),
+                style: TextStyles.termsText(context).copyWith(
+                  fontSize: isExtraSmallScreen ? 12 : 14,
+                ),
               ),
               const SizedBox(width: 4),
               GestureDetector(
                 onTap: () {},
                 child: Text(
                   'Privacy Policy',
-                  style: TextStyles.termsText(context)
-                      .copyWith(fontWeight: FontWeight.bold),
+                  style: TextStyles.termsText(context).copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: isExtraSmallScreen ? 12 : 14,
+                  ),
                 ),
               ),
             ],
